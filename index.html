@@ -1,551 +1,1719 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>slice & reduce playground</title>
-<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600&family=Syne:wght@400;500;600;700&display=swap" rel="stylesheet">
-<style>
-  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>JS Methods Playground</title>
+  <link
+    href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600&family=Syne:wght@400;500;600;700&display=swap"
+    rel="stylesheet">
+  <style>
+    *,
+    *::before,
+    *::after {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0
+    }
 
-  :root {
-    --bg: #0e0e11;
-    --surface: #16161a;
-    --surface2: #1e1e24;
-    --border: rgba(255,255,255,0.07);
-    --border2: rgba(255,255,255,0.12);
-    --text: #e8e8f0;
-    --muted: #6e6e88;
-    --accent: #7c6af7;
-    --accent-glow: rgba(124,106,247,0.15);
-    --accent2: #f7836a;
-    --green: #4ade80;
-    --green-bg: rgba(74,222,128,0.08);
-    --blue: #60a5fa;
-    --blue-bg: rgba(96,165,250,0.1);
-    --coral-bg: rgba(247,131,106,0.1);
-    --mono: 'JetBrains Mono', monospace;
-    --sans: 'Syne', sans-serif;
-  }
+    :root {
+      --bg: #0e0e11;
+      --surface: #16161a;
+      --surface2: #1e1e24;
+      --border: rgba(255, 255, 255, 0.07);
+      --border2: rgba(255, 255, 255, 0.13);
+      --text: #e8e8f0;
+      --muted: #6e6e88;
+      --muted2: #9999b0;
+      --accent: #7c6af7;
+      --accent2: #f7836a;
+      --green: #4ade80;
+      --green-bg: rgba(74, 222, 128, 0.08);
+      --blue: #60a5fa;
+      --blue-bg: rgba(96, 165, 250, 0.08);
+      --amber: #fbbf24;
+      --amber-bg: rgba(251, 191, 36, 0.08);
+      --pink: #f472b6;
+      --pink-bg: rgba(244, 114, 182, 0.08);
+      --coral-bg: rgba(247, 131, 106, 0.1);
+      --mono: 'JetBrains Mono', monospace;
+      --sans: 'Syne', sans-serif;
+    }
 
-  body {
-    background: var(--bg);
-    color: var(--text);
-    font-family: var(--sans);
-    font-size: 15px;
-    line-height: 1.6;
-    min-height: 100vh;
-    padding: 2rem 1rem 4rem;
-  }
+    body {
+      background: var(--bg);
+      color: var(--text);
+      font-family: var(--sans);
+      font-size: 15px;
+      line-height: 1.6;
+      min-height: 100vh;
+    }
 
-  .page {
-    max-width: 780px;
-    margin: 0 auto;
-  }
+    /* Layout */
+    .shell {
+      display: flex;
+      min-height: 100vh;
+    }
 
-  header {
-    margin-bottom: 3rem;
-    padding-bottom: 1.5rem;
-    border-bottom: 1px solid var(--border);
-  }
+    /* Sidebar */
+    .sidebar {
+      width: 230px;
+      flex-shrink: 0;
+      background: var(--surface);
+      border-right: 1px solid var(--border);
+      padding: 1.5rem 0;
+      position: sticky;
+      top: 0;
+      height: 100vh;
+      overflow-y: auto;
+    }
 
-  header h1 {
-    font-size: 2rem;
-    font-weight: 700;
-    letter-spacing: -0.03em;
-    color: #fff;
-  }
+    .sidebar-logo {
+      padding: 0 1.25rem 1.25rem;
+      border-bottom: 1px solid var(--border);
+      margin-bottom: 1rem;
+    }
 
-  header h1 span { color: var(--accent); }
+    .sidebar-logo h1 {
+      font-size: 1.1rem;
+      font-weight: 700;
+      color: #fff;
+      letter-spacing: -0.02em;
+    }
 
-  header p {
-    margin-top: 6px;
-    color: var(--muted);
-    font-size: 14px;
-    font-family: var(--mono);
-  }
+    .sidebar-logo span {
+      color: var(--accent);
+    }
 
-  .section {
-    margin-bottom: 2.5rem;
-    background: var(--surface);
-    border: 1px solid var(--border);
-    border-radius: 16px;
-    overflow: hidden;
-  }
+    .sidebar-logo p {
+      font-size: 11px;
+      color: var(--muted);
+      font-family: var(--mono);
+      margin-top: 2px;
+    }
 
-  .section-header {
-    padding: 1.25rem 1.5rem;
-    border-bottom: 1px solid var(--border);
-    display: flex;
-    align-items: center;
-    gap: 12px;
-  }
+    .nav-group {
+      margin-bottom: 0.5rem;
+    }
 
-  .badge {
-    font-family: var(--mono);
-    font-size: 11px;
-    font-weight: 600;
-    padding: 3px 10px;
-    border-radius: 20px;
-    letter-spacing: 0.04em;
-    text-transform: uppercase;
-  }
+    .nav-group-label {
+      font-size: 10px;
+      font-weight: 600;
+      color: var(--muted);
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      padding: 0.5rem 1.25rem 0.25rem;
+    }
 
-  .badge-purple { background: rgba(124,106,247,0.15); color: var(--accent); border: 1px solid rgba(124,106,247,0.25); }
-  .badge-coral  { background: var(--coral-bg); color: var(--accent2); border: 1px solid rgba(247,131,106,0.25); }
-  .badge-green  { background: var(--green-bg); color: var(--green); border: 1px solid rgba(74,222,128,0.2); }
+    .nav-item {
+      display: block;
+      padding: 6px 1.25rem;
+      font-size: 13px;
+      color: var(--muted2);
+      cursor: pointer;
+      transition: all 0.15s;
+      font-family: var(--mono);
+      border-left: 2px solid transparent;
+      text-decoration: none;
+    }
 
-  .section-title {
-    font-size: 16px;
-    font-weight: 600;
-    color: #fff;
-  }
+    .nav-item:hover {
+      color: var(--text);
+      background: var(--surface2);
+    }
 
-  .section-sub {
-    font-size: 12px;
-    color: var(--muted);
-    font-family: var(--mono);
-    margin-left: auto;
-  }
+    .nav-item.active {
+      color: var(--accent);
+      border-left-color: var(--accent);
+      background: rgba(124, 106, 247, 0.06);
+    }
 
-  .section-body { padding: 1.5rem; }
+    /* Main */
+    .main {
+      flex: 1;
+      padding: 2rem 2.5rem 4rem;
+      max-width: 860px;
+    }
 
-  .code-block {
-    font-family: var(--mono);
-    font-size: 13px;
-    background: var(--bg);
-    border: 1px solid var(--border);
-    border-radius: 10px;
-    padding: 14px 16px;
-    margin-bottom: 1.25rem;
-    white-space: pre;
-    overflow-x: auto;
-    color: var(--text);
-    line-height: 1.8;
-  }
+    .page-header {
+      margin-bottom: 2rem;
+      padding-bottom: 1.25rem;
+      border-bottom: 1px solid var(--border);
+    }
 
-  .code-comment { color: var(--muted); }
-  .code-kw { color: var(--accent); }
-  .code-fn { color: var(--blue); }
-  .code-num { color: var(--accent2); }
-  .code-str { color: var(--green); }
+    .page-header h2 {
+      font-size: 1.6rem;
+      font-weight: 700;
+      color: #fff;
+      letter-spacing: -0.02em;
+    }
 
-  .param-row {
-    display: flex;
-    align-items: center;
-    gap: 10px;
-    margin-bottom: 10px;
-    flex-wrap: wrap;
-  }
+    .page-header p {
+      font-size: 13px;
+      color: var(--muted);
+      font-family: var(--mono);
+      margin-top: 4px;
+    }
 
-  .param-label {
-    font-family: var(--mono);
-    font-size: 13px;
-    color: var(--muted);
-    white-space: nowrap;
-  }
+    /* Method card */
+    .method-card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      margin-bottom: 1.5rem;
+      overflow: hidden;
+    }
 
-  input[type=text], input[type=number], select {
-    background: var(--bg);
-    border: 1px solid var(--border2);
-    border-radius: 8px;
-    color: var(--text);
-    font-family: var(--mono);
-    font-size: 13px;
-    padding: 7px 12px;
-    outline: none;
-    transition: border-color 0.2s;
-  }
+    .method-header {
+      padding: 1rem 1.25rem;
+      border-bottom: 1px solid var(--border);
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      flex-wrap: wrap;
+    }
 
-  input[type=text] { flex: 1; min-width: 180px; }
-  input[type=number] { width: 68px; }
-  select { cursor: pointer; }
+    .method-name {
+      font-family: var(--mono);
+      font-size: 15px;
+      font-weight: 600;
+      color: #fff;
+    }
 
-  input:focus, select:focus { border-color: var(--accent); }
+    .method-desc {
+      font-size: 12px;
+      color: var(--muted);
+      margin-left: auto;
+    }
 
-  button {
-    background: var(--accent);
-    color: #fff;
-    border: none;
-    border-radius: 8px;
-    font-family: var(--sans);
-    font-size: 13px;
-    font-weight: 600;
-    padding: 7px 18px;
-    cursor: pointer;
-    transition: opacity 0.15s, transform 0.1s;
-    letter-spacing: 0.01em;
-  }
+    .badge {
+      font-family: var(--mono);
+      font-size: 10px;
+      font-weight: 600;
+      padding: 2px 9px;
+      border-radius: 20px;
+      letter-spacing: 0.04em;
+      text-transform: uppercase;
+      white-space: nowrap;
+    }
 
-  button:hover { opacity: 0.85; }
-  button:active { transform: scale(0.97); }
+    .badge-mut {
+      background: var(--coral-bg);
+      color: var(--accent2);
+      border: 1px solid rgba(247, 131, 106, 0.25);
+    }
 
-  .arr-display {
-    display: flex;
-    gap: 7px;
-    flex-wrap: wrap;
-    margin: 12px 0;
-  }
+    .badge-pure {
+      background: var(--blue-bg);
+      color: var(--blue);
+      border: 1px solid rgba(96, 165, 250, 0.2);
+    }
 
-  .arr-cell {
-    width: 40px;
-    height: 40px;
-    border-radius: 8px;
-    border: 1px solid var(--border2);
-    background: var(--surface2);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-family: var(--mono);
-    font-size: 15px;
-    font-weight: 500;
-    color: var(--text);
-    transition: all 0.2s;
-    position: relative;
-  }
+    .badge-obj {
+      background: var(--amber-bg);
+      color: var(--amber);
+      border: 1px solid rgba(251, 191, 36, 0.2);
+    }
 
-  .arr-cell .idx {
-    position: absolute;
-    top: -18px;
-    font-size: 10px;
-    color: var(--muted);
-    font-family: var(--mono);
-  }
+    .badge-new {
+      background: var(--pink-bg);
+      color: var(--pink);
+      border: 1px solid rgba(244, 114, 182, 0.2);
+    }
 
-  .arr-cell.highlight {
-    background: rgba(124,106,247,0.18);
-    border-color: var(--accent);
-    color: #c4bcff;
-  }
+    .method-body {
+      padding: 1.25rem;
+    }
 
-  .arr-cell.removed {
-    background: var(--coral-bg);
-    border-color: rgba(247,131,106,0.35);
-    color: var(--accent2);
-    opacity: 0.6;
-  }
+    .code-block {
+      font-family: var(--mono);
+      font-size: 12.5px;
+      background: var(--bg);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 12px 14px;
+      margin-bottom: 1rem;
+      white-space: pre;
+      overflow-x: auto;
+      color: var(--text);
+      line-height: 1.9;
+    }
 
-  .result-row {
-    display: flex;
-    gap: 12px;
-    margin-top: 1rem;
-    flex-wrap: wrap;
-  }
+    .ck {
+      color: var(--accent);
+    }
 
-  .result-card {
-    flex: 1;
-    min-width: 160px;
-    background: var(--surface2);
-    border: 1px solid var(--border);
-    border-radius: 10px;
-    padding: 12px 16px;
-  }
+    .cf {
+      color: var(--blue);
+    }
 
-  .result-label {
-    font-size: 11px;
-    color: var(--muted);
-    font-family: var(--mono);
-    text-transform: uppercase;
-    letter-spacing: 0.06em;
-    margin-bottom: 6px;
-  }
+    .cn {
+      color: var(--accent2);
+    }
 
-  .result-val {
-    font-family: var(--mono);
-    font-size: 15px;
-    font-weight: 600;
-    color: var(--green);
-    background: var(--green-bg);
-    border-radius: 6px;
-    padding: 6px 10px;
-    display: inline-block;
-  }
+    .cs {
+      color: var(--green);
+    }
 
-  .steps-box {
-    background: var(--bg);
-    border: 1px solid var(--border);
-    border-radius: 10px;
-    padding: 12px 16px;
-    margin: 12px 0;
-  }
+    .cc {
+      color: var(--muted);
+    }
 
-  .steps-header {
-    font-family: var(--mono);
-    font-size: 11px;
-    color: var(--muted);
-    margin-bottom: 8px;
-    display: grid;
-    grid-template-columns: 50px 90px 70px 1fr;
-    gap: 8px;
-    text-transform: uppercase;
-    letter-spacing: 0.05em;
-  }
+    /* Controls */
+    .ctrl-row {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      margin-bottom: 8px;
+      flex-wrap: wrap;
+    }
 
-  .step-row {
-    font-family: var(--mono);
-    font-size: 13px;
-    display: grid;
-    grid-template-columns: 50px 90px 70px 1fr;
-    gap: 8px;
-    padding: 5px 0;
-    border-top: 1px solid var(--border);
-    color: var(--muted);
-    align-items: center;
-  }
+    .ctrl-label {
+      font-family: var(--mono);
+      font-size: 12px;
+      color: var(--muted);
+      white-space: nowrap;
+    }
 
-  .step-row:first-of-type { border-top: none; }
-  .step-acc { color: var(--green); font-weight: 500; }
-  .step-cur { color: var(--blue); font-weight: 500; }
+    input[type=text],
+    input[type=number],
+    select,
+    textarea {
+      background: var(--bg);
+      border: 1px solid var(--border2);
+      border-radius: 7px;
+      color: var(--text);
+      font-family: var(--mono);
+      font-size: 12px;
+      padding: 6px 10px;
+      outline: none;
+      transition: border-color 0.2s;
+    }
 
-  .divider {
-    border: none;
-    border-top: 1px solid var(--border);
-    margin: 2.5rem 0;
-  }
+    input[type=text] {
+      flex: 1;
+      min-width: 120px;
+    }
 
-  .patterns {
-    margin-top: 1.25rem;
-  }
+    input[type=number] {
+      width: 64px;
+    }
 
-  .patterns-label {
-    font-size: 12px;
-    color: var(--muted);
-    margin-bottom: 8px;
-    font-family: var(--mono);
-  }
+    select {
+      cursor: pointer;
+    }
 
-  .combo-result {
-    font-family: var(--mono);
-    font-size: 13px;
-    color: var(--green);
-    background: var(--green-bg);
-    border-radius: 8px;
-    padding: 10px 14px;
-    margin-top: 10px;
-    border: 1px solid rgba(74,222,128,0.15);
-    line-height: 1.8;
-  }
+    textarea {
+      width: 100%;
+      resize: vertical;
+      min-height: 70px;
+    }
 
-  .combo-result .step { color: var(--muted); }
-  .combo-result .val { color: var(--green); font-weight: 600; }
-  .combo-result .arr { color: var(--accent); }
-</style>
+    input:focus,
+    select:focus,
+    textarea:focus {
+      border-color: var(--accent);
+    }
+
+    button {
+      background: var(--accent);
+      color: #fff;
+      border: none;
+      border-radius: 7px;
+      font-family: var(--sans);
+      font-size: 12px;
+      font-weight: 600;
+      padding: 6px 16px;
+      cursor: pointer;
+      transition: opacity 0.15s, transform 0.1s;
+      letter-spacing: 0.01em;
+      white-space: nowrap;
+    }
+
+    button:hover {
+      opacity: 0.85;
+    }
+
+    button:active {
+      transform: scale(0.97);
+    }
+
+    button.sec {
+      background: var(--surface2);
+      color: var(--muted2);
+      border: 1px solid var(--border2);
+    }
+
+    button.sec:hover {
+      color: var(--text);
+    }
+
+    /* Result */
+    .result-box {
+      font-family: var(--mono);
+      font-size: 13px;
+      background: var(--green-bg);
+      border: 1px solid rgba(74, 222, 128, 0.15);
+      border-radius: 8px;
+      padding: 10px 14px;
+      margin-top: 8px;
+      color: var(--green);
+      line-height: 1.8;
+      white-space: pre-wrap;
+      word-break: break-all;
+    }
+
+    .result-box.info {
+      background: var(--blue-bg);
+      border-color: rgba(96, 165, 250, 0.15);
+      color: var(--blue);
+    }
+
+    .result-box.warn {
+      background: var(--coral-bg);
+      border-color: rgba(247, 131, 106, 0.2);
+      color: var(--accent2);
+    }
+
+    /* Arr cells */
+    .arr-row {
+      display: flex;
+      gap: 6px;
+      flex-wrap: wrap;
+      margin: 10px 0;
+    }
+
+    .acell {
+      min-width: 38px;
+      height: 38px;
+      border-radius: 7px;
+      border: 1px solid var(--border2);
+      background: var(--surface2);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-family: var(--mono);
+      font-size: 13px;
+      font-weight: 500;
+      color: var(--text);
+      transition: all 0.2s;
+      position: relative;
+      padding: 0 6px;
+    }
+
+    .acell .idx {
+      position: absolute;
+      top: -17px;
+      font-size: 10px;
+      color: var(--muted);
+      font-family: var(--mono);
+    }
+
+    .acell.hi {
+      background: rgba(124, 106, 247, 0.18);
+      border-color: var(--accent);
+      color: #c4bcff;
+    }
+
+    .acell.rm {
+      background: var(--coral-bg);
+      border-color: rgba(247, 131, 106, 0.35);
+      color: var(--accent2);
+      opacity: 0.55;
+    }
+
+    .acell.new {
+      background: var(--green-bg);
+      border-color: rgba(74, 222, 128, 0.3);
+      color: var(--green);
+    }
+
+    /* Steps table */
+    .steps {
+      background: var(--bg);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 10px 14px;
+      margin: 10px 0;
+      overflow-x: auto;
+    }
+
+    .step-head {
+      font-size: 10px;
+      color: var(--muted);
+      font-family: var(--mono);
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+      padding-bottom: 6px;
+      border-bottom: 1px solid var(--border);
+    }
+
+    .step-r {
+      font-family: var(--mono);
+      font-size: 12px;
+      padding: 5px 0;
+      border-bottom: 1px solid var(--border);
+      color: var(--muted);
+    }
+
+    .step-r:last-child {
+      border-bottom: none;
+    }
+
+    .sa {
+      color: var(--green);
+      font-weight: 500;
+    }
+
+    .sc {
+      color: var(--blue);
+      font-weight: 500;
+    }
+
+    .sk {
+      color: var(--amber);
+      font-weight: 500;
+    }
+
+    /* Object display */
+    .obj-grid {
+      display: grid;
+      gap: 6px;
+      margin: 10px 0;
+    }
+
+    .obj-row {
+      display: flex;
+      gap: 8px;
+      font-family: var(--mono);
+      font-size: 12px;
+      background: var(--bg);
+      padding: 6px 10px;
+      border-radius: 6px;
+      border: 1px solid var(--border);
+    }
+
+    .obj-key {
+      color: var(--amber);
+      font-weight: 500;
+    }
+
+    .obj-val {
+      color: var(--green);
+    }
+
+    .obj-sep {
+      color: var(--muted);
+    }
+
+    /* Section divider */
+    .section-page {
+      display: none;
+    }
+
+    .section-page.active {
+      display: block;
+    }
+
+    /* Two col */
+    .two-col {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 12px;
+    }
+
+    @media(max-width:600px) {
+      .two-col {
+        grid-template-columns: 1fr;
+      }
+
+      .sidebar {
+        display: none;
+      }
+
+      .main {
+        padding: 1rem;
+      }
+    }
+  </style>
 </head>
+
 <body>
-<div class="page">
+  <div class="shell">
 
-  <header>
-    <h1><span>slice</span> &amp; <span>reduce</span> playground</h1>
-    <p>// interactive JS method explorer — tweak inputs, see it live</p>
-  </header>
-
-  <!-- SLICE -->
-  <div class="section">
-    <div class="section-header">
-      <span class="badge badge-purple">Method 01</span>
-      <span class="section-title">Array.slice(start, end)</span>
-      <span class="section-sub">non-mutating</span>
-    </div>
-    <div class="section-body">
-      <div class="code-block"><span class="code-kw">const</span> result = arr.<span class="code-fn">slice</span>(<span class="code-num">start</span>, <span class="code-num">end</span>)
-<span class="code-comment">// start → index to begin  (inclusive)
-// end   → index to stop   (exclusive) — omit to go till end
-// does NOT change original array</span></div>
-
-      <div class="param-row">
-        <span class="param-label">arr =</span>
-        <input type="text" id="slice-arr" value="2, 1, 5, 1, 3, 2">
+    <!-- SIDEBAR -->
+    <nav class="sidebar">
+      <div class="sidebar-logo">
+        <h1>JS <span>Methods</span></h1>
+        <p>// interactive playground</p>
       </div>
-      <div class="param-row">
-        <span class="param-label">start =</span>
-        <input type="number" id="slice-start" value="1">
-        <span class="param-label">end =</span>
-        <input type="number" id="slice-end" value="4">
-        <button onclick="runSlice()">Run</button>
+      <div class="nav-group">
+        <div class="nav-group-label">Arrays</div>
+        <a class="nav-item active" onclick="show('arr-transform')">Transform</a>
+        <a class="nav-item" onclick="show('arr-search')">Search & Check</a>
+        <a class="nav-item" onclick="show('arr-mutate')">Mutate</a>
+        <a class="nav-item" onclick="show('arr-reduce')">Reduce & Fold</a>
+        <a class="nav-item" onclick="show('arr-slice')">Slice & Splice</a>
+        <a class="nav-item" onclick="show('arr-sort')">Sort & Reverse</a>
+        <a class="nav-item" onclick="show('arr-flat')">Flat & Spread</a>
       </div>
-
-      <div style="margin-top:18px; padding-top:4px;">
-        <div class="param-label" style="margin-bottom:14px;">Visual (highlighted = in slice, faded = removed/out)</div>
-        <div class="arr-display" id="slice-cells"></div>
+      <div class="nav-group">
+        <div class="nav-group-label">Objects</div>
+        <a class="nav-item" onclick="show('obj-keys')">Keys, Values, Entries</a>
+        <a class="nav-item" onclick="show('obj-assign')">Assign & Spread</a>
+        <a class="nav-item" onclick="show('obj-freeze')">Freeze & Seal</a>
+        <a class="nav-item" onclick="show('obj-destruct')">Destructuring</a>
       </div>
+      <div class="nav-group">
+        <div class="nav-group-label">Strings (bonus)</div>
+        <a class="nav-item" onclick="show('str-methods')">String Methods</a>
+      </div>
+    </nav>
 
-      <div class="result-row">
-        <div class="result-card">
-          <div class="result-label">Original arr</div>
-          <div class="result-val" id="slice-orig"></div>
+    <!-- MAIN -->
+    <main class="main">
+
+      <!-- ====== TRANSFORM ====== -->
+      <div id="arr-transform" class="section-page active">
+        <div class="page-header">
+          <h2>Array — Transform</h2>
+          <p>// map, filter, forEach — create new arrays from existing ones</p>
         </div>
-        <div class="result-card">
-          <div class="result-label">Sliced result</div>
-          <div class="result-val" id="slice-result"></div>
+
+        <!-- map -->
+        <div class="method-card">
+          <div class="method-header">
+            <span class="method-name">.map()</span>
+            <span class="badge badge-pure">pure</span>
+            <span class="method-desc">transform every element → new array</span>
+          </div>
+          <div class="method-body">
+            <div class="code-block"><span class="ck">const</span> doubled = arr.<span class="cf">map</span>(x => x *
+              <span class="cn">2</span>)
+              <span class="cc">// runs callback on each element
+                // returns a NEW array of same length
+                // original untouched</span>
+            </div>
+            <div class="ctrl-row">
+              <span class="ctrl-label">arr =</span>
+              <input type="text" id="map-arr" value="1, 2, 3, 4, 5">
+              <span class="ctrl-label">op:</span>
+              <select id="map-op">
+                <option value="x*2">x * 2</option>
+                <option value="x**2">x ** 2 (square)</option>
+                <option value="x+10">x + 10</option>
+                <option value="str">String(x)</option>
+                <option value="obj">{val: x}</option>
+              </select>
+              <button onclick="runMap()">Run</button>
+            </div>
+            <div id="map-cells" class="arr-row"></div>
+            <div class="result-box" id="map-result"></div>
+          </div>
+        </div>
+
+        <!-- filter -->
+        <div class="method-card">
+          <div class="method-header">
+            <span class="method-name">.filter()</span>
+            <span class="badge badge-pure">pure</span>
+            <span class="method-desc">keep only elements that pass a test</span>
+          </div>
+          <div class="method-body">
+            <div class="code-block"><span class="ck">const</span> evens = arr.<span class="cf">filter</span>(x => x %
+              <span class="cn">2</span> === <span class="cn">0</span>)
+              <span class="cc">// callback returns true/false
+                // true → element kept, false → element dropped
+                // result array may be shorter</span>
+            </div>
+            <div class="ctrl-row">
+              <span class="ctrl-label">arr =</span>
+              <input type="text" id="filter-arr" value="1, 2, 3, 4, 5, 6, 7, 8">
+              <span class="ctrl-label">condition:</span>
+              <select id="filter-op">
+                <option value="even">x % 2 === 0 (evens)</option>
+                <option value="odd">x % 2 !== 0 (odds)</option>
+                <option value="gt3">x > 3</option>
+                <option value="lt5">x < 5</option>
+                <option value="pos">x > 0</option>
+              </select>
+              <button onclick="runFilter()">Run</button>
+            </div>
+            <div id="filter-cells" class="arr-row"></div>
+            <div class="result-box" id="filter-result"></div>
+          </div>
+        </div>
+
+        <!-- forEach -->
+        <div class="method-card">
+          <div class="method-header">
+            <span class="method-name">.forEach()</span>
+            <span class="badge badge-mut">side-effect</span>
+            <span class="method-desc">loop over elements, returns undefined</span>
+          </div>
+          <div class="method-body">
+            <div class="code-block">arr.<span class="cf">forEach</span>((item, index) => {
+              console.<span class="cf">log</span>(index, item)
+              })
+              <span class="cc">// use when you just want to DO something
+                // unlike map, does NOT return a new array
+                // cannot break out of it (use for..of instead)</span>
+            </div>
+            <div class="ctrl-row">
+              <span class="ctrl-label">arr =</span>
+              <input type="text" id="foreach-arr" value="10, 20, 30, 40">
+              <button onclick="runForEach()">Run</button>
+            </div>
+            <div class="result-box info" id="foreach-result"></div>
+          </div>
         </div>
       </div>
 
-      <div class="patterns">
-        <div class="patterns-label">// common patterns</div>
-        <div class="code-block">arr.<span class="code-fn">slice</span>(<span class="code-num">0</span>, <span class="code-num">3</span>)    <span class="code-comment">→ first 3 elements</span>
-arr.<span class="code-fn">slice</span>(<span class="code-num">2</span>)       <span class="code-comment">→ from index 2 to end</span>
-arr.<span class="code-fn">slice</span>(<span class="code-num">-2</span>)      <span class="code-comment">→ last 2 elements</span>
-arr.<span class="code-fn">slice</span>(<span class="code-num">1</span>, <span class="code-num">-1</span>)   <span class="code-comment">→ drop first and last</span></div>
+      <!-- ====== SEARCH ====== -->
+      <div id="arr-search" class="section-page">
+        <div class="page-header">
+          <h2>Array — Search & Check</h2>
+          <p>// find, findIndex, includes, some, every, indexOf</p>
+        </div>
+
+        <!-- find / findIndex -->
+        <div class="method-card">
+          <div class="method-header">
+            <span class="method-name">.find() &amp; .findIndex()</span>
+            <span class="badge badge-pure">pure</span>
+          </div>
+          <div class="method-body">
+            <div class="code-block"><span class="ck">const</span> found = arr.<span class="cf">find</span>(x => x >
+              <span class="cn">3</span>)
+              <span class="cc">// returns the FIRST element that passes
+                // find → returns the element itself (or undefined)
+                // findIndex → returns the index (or -1)</span>
+            </div>
+            <div class="ctrl-row">
+              <span class="ctrl-label">arr =</span>
+              <input type="text" id="find-arr" value="1, 3, 5, 7, 9, 2">
+              <span class="ctrl-label">find where x</span>
+              <select id="find-op">
+                <option value="gt3">x > 3</option>
+                <option value="even">x % 2 === 0</option>
+                <option value="gt8">x > 8</option>
+                <option value="lt0">x < 0</option>
+              </select>
+              <button onclick="runFind()">Run</button>
+            </div>
+            <div id="find-cells" class="arr-row"></div>
+            <div class="result-box" id="find-result"></div>
+          </div>
+        </div>
+
+        <!-- includes / indexOf -->
+        <div class="method-card">
+          <div class="method-header">
+            <span class="method-name">.includes() &amp; .indexOf()</span>
+            <span class="badge badge-pure">pure</span>
+          </div>
+          <div class="method-body">
+            <div class="code-block">arr.<span class="cf">includes</span>(<span class="cn">5</span>) <span class="cc">//
+                true / false</span>
+              arr.<span class="cf">indexOf</span>(<span class="cn">5</span>) <span class="cc">// index or -1</span>
+              arr.<span class="cf">lastIndexOf</span>(<span class="cn">5</span>) <span class="cc">// last occurrence
+                index</span></div>
+            <div class="ctrl-row">
+              <span class="ctrl-label">arr =</span>
+              <input type="text" id="includes-arr" value="10, 20, 30, 20, 40">
+              <span class="ctrl-label">search:</span>
+              <input type="number" id="includes-val" value="20" style="width:64px">
+              <button onclick="runIncludes()">Run</button>
+            </div>
+            <div class="result-box" id="includes-result"></div>
+          </div>
+        </div>
+
+        <!-- some / every -->
+        <div class="method-card">
+          <div class="method-header">
+            <span class="method-name">.some() &amp; .every()</span>
+            <span class="badge badge-pure">pure</span>
+          </div>
+          <div class="method-body">
+            <div class="code-block">arr.<span class="cf">some</span>(x => x > <span class="cn">5</span>) <span
+                class="cc">// true if AT LEAST ONE passes</span>
+              arr.<span class="cf">every</span>(x => x > <span class="cn">0</span>) <span class="cc">// true if ALL
+                pass</span></div>
+            <div class="ctrl-row">
+              <span class="ctrl-label">arr =</span>
+              <input type="text" id="someevery-arr" value="2, 4, 6, 7, 8">
+              <span class="ctrl-label">test:</span>
+              <select id="someevery-op">
+                <option value="even">x % 2 === 0</option>
+                <option value="gt0">x > 0</option>
+                <option value="gt5">x > 5</option>
+                <option value="lt10">x < 10</option>
+              </select>
+              <button onclick="runSomeEvery()">Run</button>
+            </div>
+            <div class="result-box" id="someevery-result"></div>
+          </div>
+        </div>
       </div>
-    </div>
+
+      <!-- ====== MUTATE ====== -->
+      <div id="arr-mutate" class="section-page">
+        <div class="page-header">
+          <h2>Array — Mutate</h2>
+          <p>// push, pop, shift, unshift — modify the array in-place</p>
+        </div>
+
+        <div class="method-card">
+          <div class="method-header">
+            <span class="method-name">push / pop / shift / unshift</span>
+            <span class="badge badge-mut">mutates</span>
+          </div>
+          <div class="method-body">
+            <div class="code-block">arr.<span class="cf">push</span>(<span class="cn">99</span>) <span class="cc">// add
+                to END, returns new length</span>
+              arr.<span class="cf">pop</span>() <span class="cc">// remove from END, returns removed item</span>
+              arr.<span class="cf">unshift</span>(<span class="cn">0</span>) <span class="cc">// add to START, returns
+                new length</span>
+              arr.<span class="cf">shift</span>() <span class="cc">// remove from START, returns removed item</span>
+            </div>
+            <div class="ctrl-row">
+              <span class="ctrl-label">array:</span>
+              <input type="text" id="mut-arr" value="1, 2, 3, 4, 5">
+              <span class="ctrl-label">value:</span>
+              <input type="number" id="mut-val" value="99" style="width:64px">
+            </div>
+            <div class="arr-row" id="mut-cells"></div>
+            <div class="ctrl-row" style="margin-top:4px">
+              <button onclick="runMut('push')">push(val)</button>
+              <button onclick="runMut('pop')" class="sec">pop()</button>
+              <button onclick="runMut('unshift')">unshift(val)</button>
+              <button onclick="runMut('shift')" class="sec">shift()</button>
+              <button onclick="resetMut()" class="sec">reset</button>
+            </div>
+            <div class="result-box" id="mut-result"></div>
+          </div>
+        </div>
+
+        <!-- concat / join -->
+        <div class="method-card">
+          <div class="method-header">
+            <span class="method-name">.concat() &amp; .join()</span>
+            <span class="badge badge-pure">pure</span>
+          </div>
+          <div class="method-body">
+            <div class="code-block">arr.<span class="cf">concat</span>([<span class="cn">6</span>,<span
+                class="cn">7</span>]) <span class="cc">// merge arrays → new array</span>
+              arr.<span class="cf">join</span>(<span class="cs">' - '</span>) <span class="cc">// array → string with
+                separator</span></div>
+            <div class="ctrl-row">
+              <span class="ctrl-label">arr1 =</span>
+              <input type="text" id="concat-a" value="1, 2, 3">
+              <span class="ctrl-label">arr2 =</span>
+              <input type="text" id="concat-b" value="4, 5, 6">
+              <span class="ctrl-label">sep:</span>
+              <input type="text" id="join-sep" value=" - " style="width:50px">
+              <button onclick="runConcat()">Run</button>
+            </div>
+            <div class="result-box" id="concat-result"></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ====== REDUCE ====== -->
+      <div id="arr-reduce" class="section-page">
+        <div class="page-header">
+          <h2>Array — Reduce & Fold</h2>
+          <p>// reduce, reduceRight — accumulate to a single value</p>
+        </div>
+
+        <div class="method-card">
+          <div class="method-header">
+            <span class="method-name">.reduce(callback, initial)</span>
+            <span class="badge badge-pure">pure</span>
+          </div>
+          <div class="method-body">
+            <div class="code-block">arr.<span class="cf">reduce</span>((<span class="sc">acc</span>, <span
+                class="sk">cur</span>) => acc + cur, <span class="cn">0</span>)
+              <span class="cc">// acc → accumulator (carries result)
+                // cur → current element
+                // 0 → initial value of acc
+                // just a loop with memory</span>
+            </div>
+            <div class="ctrl-row">
+              <span class="ctrl-label">arr =</span>
+              <input type="text" id="reduce-arr" value="2, 1, 5, 1, 3, 2">
+              <span class="ctrl-label">op:</span>
+              <select id="reduce-op">
+                <option value="sum">acc + cur (sum)</option>
+                <option value="product">acc * cur (product)</option>
+                <option value="max">Math.max(acc,cur)</option>
+                <option value="min">Math.min(acc,cur)</option>
+                <option value="count">count elements</option>
+              </select>
+              <button onclick="runReduce()">Run</button>
+            </div>
+            <div class="steps" id="reduce-steps">
+              <div class="step-head" style="display:grid;grid-template-columns:50px 90px 70px 1fr;gap:8px">
+                <span>step</span><span>acc</span><span>cur</span><span>new acc</span>
+              </div>
+            </div>
+            <div class="result-box" id="reduce-result"></div>
+          </div>
+        </div>
+
+        <!-- reduce to object -->
+        <div class="method-card">
+          <div class="method-header">
+            <span class="method-name">reduce → object (group/count)</span>
+            <span class="badge badge-pure">pure</span>
+          </div>
+          <div class="method-body">
+            <div class="code-block"><span class="cc">// count occurrences of each value</span>
+              <span class="ck">const</span> counts = arr.<span class="cf">reduce</span>((acc, cur) => {
+              acc[cur] = (acc[cur] || <span class="cn">0</span>) + <span class="cn">1</span>
+              <span class="ck">return</span> acc
+              }, {})
+            </div>
+            <div class="ctrl-row">
+              <span class="ctrl-label">arr =</span>
+              <input type="text" id="reduce-obj-arr" value="a, b, a, c, b, a, d">
+              <button onclick="runReduceObj()">Count occurrences</button>
+            </div>
+            <div class="result-box" id="reduce-obj-result"></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ====== SLICE/SPLICE ====== -->
+      <div id="arr-slice" class="section-page">
+        <div class="page-header">
+          <h2>Array — Slice & Splice</h2>
+          <p>// slice = pure copy, splice = mutates in-place</p>
+        </div>
+
+        <!-- slice -->
+        <div class="method-card">
+          <div class="method-header">
+            <span class="method-name">.slice(start, end)</span>
+            <span class="badge badge-pure">pure</span>
+            <span class="method-desc">cuts a copy, original untouched</span>
+          </div>
+          <div class="method-body">
+            <div class="code-block">arr.<span class="cf">slice</span>(<span class="cn">1</span>, <span
+                class="cn">4</span>) <span class="cc">// [index 1, 2, 3] — end exclusive</span>
+              arr.<span class="cf">slice</span>(<span class="cn">2</span>) <span class="cc">// index 2 to end</span>
+              arr.<span class="cf">slice</span>(<span class="cn">-2</span>) <span class="cc">// last 2 elements</span>
+            </div>
+            <div class="ctrl-row">
+              <span class="ctrl-label">arr =</span>
+              <input type="text" id="slice-arr" value="2, 1, 5, 1, 3, 2">
+              <span class="ctrl-label">start:</span>
+              <input type="number" id="slice-start" value="1">
+              <span class="ctrl-label">end:</span>
+              <input type="number" id="slice-end" value="4">
+              <button onclick="runSlice()">Run</button>
+            </div>
+            <div class="arr-row" id="slice-cells" style="margin-top:20px"></div>
+            <div class="result-box" id="slice-result"></div>
+          </div>
+        </div>
+
+        <!-- splice -->
+        <div class="method-card">
+          <div class="method-header">
+            <span class="method-name">.splice(start, deleteCount, ...items)</span>
+            <span class="badge badge-mut">mutates</span>
+            <span class="method-desc">remove/insert in-place</span>
+          </div>
+          <div class="method-body">
+            <div class="code-block">arr.<span class="cf">splice</span>(<span class="cn">2</span>, <span
+                class="cn">1</span>) <span class="cc">// remove 1 item at index 2</span>
+              arr.<span class="cf">splice</span>(<span class="cn">1</span>, <span class="cn">0</span>, <span
+                class="cn">99</span>) <span class="cc">// insert 99 at index 1</span>
+              arr.<span class="cf">splice</span>(<span class="cn">1</span>, <span class="cn">2</span>, <span
+                class="cn">10</span>, <span class="cn">20</span>) <span class="cc">// replace 2 items from index
+                1</span>
+              <span class="cc">// returns removed elements as array</span>
+            </div>
+            <div class="ctrl-row">
+              <span class="ctrl-label">arr =</span>
+              <input type="text" id="splice-arr" value="10, 20, 30, 40, 50">
+              <span class="ctrl-label">start:</span>
+              <input type="number" id="splice-start" value="1">
+              <span class="ctrl-label">delete:</span>
+              <input type="number" id="splice-del" value="2">
+              <span class="ctrl-label">insert:</span>
+              <input type="text" id="splice-ins" value="99, 88" style="width:80px">
+              <button onclick="runSplice()">Run</button>
+            </div>
+            <div class="result-box" id="splice-result"></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ====== SORT ====== -->
+      <div id="arr-sort" class="section-page">
+        <div class="page-header">
+          <h2>Array — Sort & Reverse</h2>
+          <p>// sort mutates! use [...arr].sort() for a safe copy</p>
+        </div>
+
+        <div class="method-card">
+          <div class="method-header">
+            <span class="method-name">.sort(compareFn)</span>
+            <span class="badge badge-mut">mutates</span>
+          </div>
+          <div class="method-body">
+            <div class="code-block">arr.<span class="cf">sort</span>((a, b) => a - b) <span class="cc">// ascending
+                numbers</span>
+              arr.<span class="cf">sort</span>((a, b) => b - a) <span class="cc">// descending numbers</span>
+              arr.<span class="cf">sort</span>() <span class="cc">// lexicographic (strings) — careful!</span>
+              [...arr].<span class="cf">sort</span>((a,b)=>a-b) <span class="cc">// safe: sort a copy</span></div>
+            <div class="ctrl-row">
+              <span class="ctrl-label">arr =</span>
+              <input type="text" id="sort-arr" value="5, 2, 8, 1, 9, 3">
+              <span class="ctrl-label">by:</span>
+              <select id="sort-op">
+                <option value="asc">a - b (asc)</option>
+                <option value="desc">b - a (desc)</option>
+                <option value="lexi">default (lexicographic)</option>
+              </select>
+              <button onclick="runSort()">Run</button>
+            </div>
+            <div id="sort-cells" class="arr-row"></div>
+            <div class="result-box" id="sort-result"></div>
+          </div>
+        </div>
+
+        <div class="method-card">
+          <div class="method-header">
+            <span class="method-name">.reverse()</span>
+            <span class="badge badge-mut">mutates</span>
+          </div>
+          <div class="method-body">
+            <div class="code-block">arr.<span class="cf">reverse</span>() <span class="cc">// reverses in-place</span>
+              [...arr].<span class="cf">reverse</span>() <span class="cc">// safe copy reverse</span></div>
+            <div class="ctrl-row">
+              <span class="ctrl-label">arr =</span>
+              <input type="text" id="rev-arr" value="1, 2, 3, 4, 5">
+              <button onclick="runReverse()">Reverse</button>
+            </div>
+            <div id="rev-cells" class="arr-row"></div>
+            <div class="result-box" id="rev-result"></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ====== FLAT ====== -->
+      <div id="arr-flat" class="section-page">
+        <div class="page-header">
+          <h2>Array — Flat & Spread</h2>
+          <p>// flat, flatMap, Array.from, Array.of, spread</p>
+        </div>
+
+        <div class="method-card">
+          <div class="method-header">
+            <span class="method-name">.flat(depth) &amp; .flatMap()</span>
+            <span class="badge badge-pure">pure</span>
+          </div>
+          <div class="method-body">
+            <div class="code-block">[[<span class="cn">1</span>,<span class="cn">2</span>],[<span
+                class="cn">3</span>,<span class="cn">4</span>]].<span class="cf">flat</span>() <span class="cc">//
+                [1,2,3,4]</span>
+              [<span class="cn">1</span>,[<span class="cn">2</span>,[<span class="cn">3</span>,[<span
+                class="cn">4</span>]]]].<span class="cf">flat</span>(<span class="cn">2</span>) <span class="cc">//
+                [1,2,3,[4]]</span>
+              [<span class="cn">1</span>,[<span class="cn">2</span>,[<span class="cn">3</span>]]].<span
+                class="cf">flat</span>(Infinity) <span class="cc">// fully flatten</span>
+              arr.<span class="cf">flatMap</span>(x => [x, x*<span class="cn">2</span>]) <span class="cc">// map then
+                flat(1)</span></div>
+            <div class="ctrl-row">
+              <span class="ctrl-label">arr (JSON):</span>
+              <input type="text" id="flat-arr" value="[1,2],[3,[4,5]],[6]" style="flex:1">
+              <span class="ctrl-label">depth:</span>
+              <input type="number" id="flat-depth" value="1" style="width:50px">
+              <button onclick="runFlat()">flat()</button>
+              <button onclick="runFlatMap()" class="sec">flatMap(x=>[x,x*2])</button>
+            </div>
+            <div class="result-box" id="flat-result"></div>
+          </div>
+        </div>
+
+        <div class="method-card">
+          <div class="method-header">
+            <span class="method-name">Array.from() &amp; Array.of()</span>
+            <span class="badge badge-new">static</span>
+          </div>
+          <div class="method-body">
+            <div class="code-block">Array.<span class="cf">from</span>(<span class="cs">'hello'</span>) <span
+                class="cc">// ['h','e','l','l','o']</span>
+              Array.<span class="cf">from</span>({length:<span class="cn">5</span>},(_,i)=>i) <span class="cc">//
+                [0,1,2,3,4]</span>
+              Array.<span class="cf">from</span>(<span class="ck">new</span> Set([<span class="cn">1</span>,<span
+                class="cn">2</span>,<span class="cn">1</span>])) <span class="cc">// deduplicate!</span>
+              Array.<span class="cf">of</span>(<span class="cn">1</span>, <span class="cn">2</span>, <span
+                class="cn">3</span>) <span class="cc">// [1, 2, 3]</span>
+              [...new Set(arr)] <span class="cc">// also deduplicate</span></div>
+            <div class="ctrl-row">
+              <span class="ctrl-label">input:</span>
+              <input type="text" id="from-input" value="hello">
+              <select id="from-op">
+                <option value="str">Array.from(string)</option>
+                <option value="len">Array.from({length:n}, (_,i)=>i)</option>
+                <option value="set">Array.from(new Set(arr)) — dedupe</option>
+              </select>
+              <button onclick="runFrom()">Run</button>
+            </div>
+            <div class="result-box" id="from-result"></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ====== OBJ KEYS ====== -->
+      <div id="obj-keys" class="section-page">
+        <div class="page-header">
+          <h2>Object — Keys, Values, Entries</h2>
+          <p>// iterate and transform object properties</p>
+        </div>
+
+        <div class="method-card">
+          <div class="method-header">
+            <span class="method-name">Object.keys() / .values() / .entries()</span>
+            <span class="badge badge-obj">object</span>
+          </div>
+          <div class="method-body">
+            <div class="code-block"><span class="ck">const</span> obj = { name:<span class="cs">'Akash'</span>,
+              age:<span class="cn">25</span>, city:<span class="cs">'Delhi'</span> }
+
+              Object.<span class="cf">keys</span>(obj) <span class="cc">// ['name', 'age', 'city']</span>
+              Object.<span class="cf">values</span>(obj) <span class="cc">// ['Akash', 25, 'Delhi']</span>
+              Object.<span class="cf">entries</span>(obj) <span class="cc">// [['name','Akash'],['age',25],...]</span>
+              Object.<span class="cf">fromEntries</span>([]) <span class="cc">// entries array → object</span></div>
+            <div class="ctrl-row">
+              <span class="ctrl-label">object (JSON):</span>
+              <input type="text" id="obj-input" value='{"name":"Akash","age":25,"city":"Delhi","role":"dev"}'>
+              <button onclick="runObjKeys()">Run</button>
+            </div>
+            <div class="result-box" id="obj-keys-result"></div>
+          </div>
+        </div>
+
+        <!-- Object.fromEntries -->
+        <div class="method-card">
+          <div class="method-header">
+            <span class="method-name">Object.fromEntries() — transform object values</span>
+            <span class="badge badge-obj">object</span>
+          </div>
+          <div class="method-body">
+            <div class="code-block"><span class="cc">// powerful pattern: entries → transform → back to object</span>
+              <span class="ck">const</span> prices = { apple:<span class="cn">10</span>, banana:<span
+                class="cn">5</span>, mango:<span class="cn">20</span> }
+              <span class="ck">const</span> doubled = Object.<span class="cf">fromEntries</span>(
+              Object.<span class="cf">entries</span>(prices).<span class="cf">map</span>(([k, v]) => [k, v * <span
+                class="cn">2</span>])
+              )
+            </div>
+            <div class="ctrl-row">
+              <span class="ctrl-label">obj (JSON):</span>
+              <input type="text" id="fromentries-input" value='{"apple":10,"banana":5,"mango":20}'>
+              <span class="ctrl-label">op:</span>
+              <select id="fromentries-op">
+                <option value="double">v * 2</option>
+                <option value="upper">key.toUpperCase()</option>
+                <option value="str">String(v)</option>
+              </select>
+              <button onclick="runFromEntries()">Run</button>
+            </div>
+            <div class="result-box" id="fromentries-result"></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ====== OBJ ASSIGN ====== -->
+      <div id="obj-assign" class="section-page">
+        <div class="page-header">
+          <h2>Object — Assign & Spread</h2>
+          <p>// merge, clone, override object properties</p>
+        </div>
+
+        <div class="method-card">
+          <div class="method-header">
+            <span class="method-name">Object.assign() &amp; spread {...}</span>
+            <span class="badge badge-obj">object</span>
+          </div>
+          <div class="method-body">
+            <div class="code-block"><span class="ck">const</span> a = { x:<span class="cn">1</span>, y:<span
+                class="cn">2</span> }
+              <span class="ck">const</span> b = { y:<span class="cn">99</span>, z:<span class="cn">3</span> }
+
+              Object.<span class="cf">assign</span>({}, a, b) <span class="cc">// { x:1, y:99, z:3 } — b overrides
+                a</span>
+              { ...a, ...b } <span class="cc">// same result, cleaner syntax</span>
+              { ...a, y: <span class="cn">100</span> } <span class="cc">// override single key</span>
+              <span class="cc">// shallow copy only — nested objects still shared</span>
+            </div>
+            <div class="ctrl-row">
+              <span class="ctrl-label">obj A:</span>
+              <input type="text" id="assign-a" value='{"x":1,"y":2,"name":"Akash"}'>
+            </div>
+            <div class="ctrl-row">
+              <span class="ctrl-label">obj B:</span>
+              <input type="text" id="assign-b" value='{"y":99,"z":3,"city":"Delhi"}'>
+              <button onclick="runAssign()">Merge (B overrides A)</button>
+            </div>
+            <div class="result-box" id="assign-result"></div>
+          </div>
+        </div>
+
+        <!-- hasOwn / in -->
+        <div class="method-card">
+          <div class="method-header">
+            <span class="method-name">Object.hasOwn() &amp; 'key' in obj</span>
+            <span class="badge badge-obj">object</span>
+          </div>
+          <div class="method-body">
+            <div class="code-block">Object.<span class="cf">hasOwn</span>(obj, <span class="cs">'key'</span>) <span
+                class="cc">// true/false — own property only</span>
+              <span class="cs">'key'</span> <span class="ck">in</span> obj <span class="cc">// true/false — includes
+                inherited</span>
+              obj.hasOwnProperty(<span class="cs">'key'</span>) <span class="cc">// older way, same as hasOwn</span>
+            </div>
+            <div class="ctrl-row">
+              <span class="ctrl-label">obj (JSON):</span>
+              <input type="text" id="hasown-obj" value='{"name":"Akash","age":25}'>
+              <span class="ctrl-label">key:</span>
+              <input type="text" id="hasown-key" value="name" style="width:80px">
+              <button onclick="runHasOwn()">Check</button>
+            </div>
+            <div class="result-box" id="hasown-result"></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ====== OBJ FREEZE ====== -->
+      <div id="obj-freeze" class="section-page">
+        <div class="page-header">
+          <h2>Object — Freeze & Seal</h2>
+          <p>// prevent modification of objects</p>
+        </div>
+
+        <div class="method-card">
+          <div class="method-header">
+            <span class="method-name">Object.freeze() &amp; Object.seal()</span>
+            <span class="badge badge-obj">object</span>
+          </div>
+          <div class="method-body">
+            <div class="code-block">Object.<span class="cf">freeze</span>(obj)
+              <span class="cc">// cannot add, delete, or modify any property
+                // silently fails (no error in non-strict mode)</span>
+
+              Object.<span class="cf">seal</span>(obj)
+              <span class="cc">// cannot add or delete properties
+                // CAN still modify existing values</span>
+
+              Object.<span class="cf">isFrozen</span>(obj) <span class="cc">// check if frozen</span>
+              Object.<span class="cf">isSealed</span>(obj) <span class="cc">// check if sealed</span>
+            </div>
+            <div class="ctrl-row">
+              <span class="ctrl-label">obj (JSON):</span>
+              <input type="text" id="freeze-obj" value='{"name":"Akash","role":"dev"}'>
+              <button onclick="runFreeze('freeze')">freeze()</button>
+              <button onclick="runFreeze('seal')" class="sec">seal()</button>
+            </div>
+            <div class="result-box" id="freeze-result"></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ====== DESTRUCT ====== -->
+      <div id="obj-destruct" class="section-page">
+        <div class="page-header">
+          <h2>Object — Destructuring</h2>
+          <p>// extract values cleanly from objects and arrays</p>
+        </div>
+
+        <div class="method-card">
+          <div class="method-header">
+            <span class="method-name">Object destructuring patterns</span>
+            <span class="badge badge-obj">object</span>
+          </div>
+          <div class="method-body">
+            <div class="code-block"><span class="ck">const</span> { name, age } = obj <span class="cc">// basic</span>
+              <span class="ck">const</span> { name: n, age: a } = obj <span class="cc">// rename</span>
+              <span class="ck">const</span> { name = <span class="cs">'anon'</span> } = obj <span class="cc">// default
+                value</span>
+              <span class="ck">const</span> { a, ...rest } = obj <span class="cc">// rest/spread</span>
+
+              <span class="cc">// in function params</span>
+              <span class="ck">function</span> <span class="cf">greet</span>({ name, age = <span class="cn">0</span> })
+              { ... }</span>
+
+              <span class="cc">// nested</span>
+              <span class="ck">const</span> { addr: { city } } = user
+            </div>
+            <div class="ctrl-row">
+              <span class="ctrl-label">obj (JSON):</span>
+              <input type="text" id="destruct-obj" value='{"name":"Akash","age":25,"city":"Delhi","role":"dev"}'>
+              <span class="ctrl-label">keys to extract:</span>
+              <input type="text" id="destruct-keys" value="name, age" style="width:120px">
+              <button onclick="runDestruct()">Destructure</button>
+            </div>
+            <div class="result-box" id="destruct-result"></div>
+          </div>
+        </div>
+
+        <div class="method-card">
+          <div class="method-header">
+            <span class="method-name">Array destructuring</span>
+            <span class="badge badge-pure">array</span>
+          </div>
+          <div class="method-body">
+            <div class="code-block"><span class="ck">const</span> [a, b, c] = [<span class="cn">1</span>,<span
+                class="cn">2</span>,<span class="cn">3</span>] <span class="cc">// basic</span>
+              <span class="ck">const</span> [first, ...rest] = arr <span class="cc">// rest</span>
+              <span class="ck">const</span> [,, third] = arr <span class="cc">// skip elements</span>
+              <span class="ck">const</span> [a = <span class="cn">0</span>, b = <span class="cn">0</span>] = [] <span
+                class="cc">// defaults</span>
+              <span class="ck">let</span> x=<span class="cn">1</span>, y=<span class="cn">2</span>; [x,y]=[y,x] <span
+                class="cc">// swap!</span>
+            </div>
+            <div class="ctrl-row">
+              <span class="ctrl-label">arr =</span>
+              <input type="text" id="arr-destruct" value="10, 20, 30, 40, 50">
+              <button onclick="runArrDestruct()">Show patterns</button>
+            </div>
+            <div class="result-box" id="arr-destruct-result"></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ====== STRING ====== -->
+      <div id="str-methods" class="section-page">
+        <div class="page-header">
+          <h2>String Methods (bonus)</h2>
+          <p>// useful string methods that mirror array patterns</p>
+        </div>
+
+        <div class="method-card">
+          <div class="method-header">
+            <span class="method-name">split / includes / startsWith / endsWith</span>
+            <span class="badge badge-pure">string</span>
+          </div>
+          <div class="method-body">
+            <div class="code-block"><span class="cs">'hello world'</span>.<span class="cf">split</span>(<span
+                class="cs">' '</span>) <span class="cc">// ['hello','world']</span>
+              <span class="cs">'hello'</span>.<span class="cf">includes</span>(<span class="cs">'ell'</span>) <span
+                class="cc">// true</span>
+              <span class="cs">'hello'</span>.<span class="cf">startsWith</span>(<span class="cs">'he'</span>) <span
+                class="cc">// true</span>
+              <span class="cs">'hello'</span>.<span class="cf">endsWith</span>(<span class="cs">'lo'</span>) <span
+                class="cc">// true</span>
+              <span class="cs">'hello'</span>.<span class="cf">toUpperCase</span>() <span class="cc">// 'HELLO'</span>
+              <span class="cs">' hi '</span>.<span class="cf">trim</span>() <span class="cc">// 'hi'</span>
+              <span class="cs">'hi'</span>.<span class="cf">repeat</span>(<span class="cn">3</span>) <span class="cc">//
+                'hihihi'</span>
+              <span class="cs">'ha'</span>.<span class="cf">padStart</span>(<span class="cn">5</span>, <span
+                class="cs">'*'</span>) <span class="cc">// '***ha'</span>
+            </div>
+            <div class="ctrl-row">
+              <span class="ctrl-label">string:</span>
+              <input type="text" id="str-input" value="Hello World from JS">
+              <span class="ctrl-label">op:</span>
+              <select id="str-op">
+                <option value="split-space">split(' ')</option>
+                <option value="split-">split('')</option>
+                <option value="upper">toUpperCase()</option>
+                <option value="lower">toLowerCase()</option>
+                <option value="trim">trim()</option>
+                <option value="reverse">split→reverse→join</option>
+                <option value="replace">replace(/ /g, '_')</option>
+              </select>
+              <button onclick="runStr()">Run</button>
+            </div>
+            <div class="result-box" id="str-result"></div>
+          </div>
+        </div>
+
+        <div class="method-card">
+          <div class="method-header">
+            <span class="method-name">slice / substring / indexOf on strings</span>
+            <span class="badge badge-pure">string</span>
+          </div>
+          <div class="method-body">
+            <div class="code-block"><span class="cs">'hello'</span>.<span class="cf">slice</span>(<span
+                class="cn">1</span>, <span class="cn">3</span>) <span class="cc">// 'el' — same as array slice</span>
+              <span class="cs">'hello'</span>.<span class="cf">substring</span>(<span class="cn">1</span>, <span
+                class="cn">3</span>) <span class="cc">// 'el' — similar but no negatives</span>
+              <span class="cs">'hello'</span>.<span class="cf">indexOf</span>(<span class="cs">'l'</span>) <span
+                class="cc">// 2 — first occurrence</span>
+              <span class="cs">'hello'</span>.<span class="cf">at</span>(<span class="cn">-1</span>) <span class="cc">//
+                'o' — last char (ES2022)</span>
+              <span class="cs">`Hello ${name}`</span> <span class="cc">// template literal</span>
+            </div>
+            <div class="ctrl-row">
+              <span class="ctrl-label">str:</span>
+              <input type="text" id="strslice-input" value="JavaScript Methods">
+              <span class="ctrl-label">start:</span>
+              <input type="number" id="strslice-s" value="0">
+              <span class="ctrl-label">end:</span>
+              <input type="number" id="strslice-e" value="10">
+              <button onclick="runStrSlice()">slice()</button>
+              <button onclick="runStrAt()" class="sec">at(-1)</button>
+            </div>
+            <div class="result-box" id="strslice-result"></div>
+          </div>
+        </div>
+      </div>
+
+    </main>
   </div>
 
-  <!-- REDUCE -->
-  <div class="section">
-    <div class="section-header">
-      <span class="badge badge-coral">Method 02</span>
-      <span class="section-title">Array.reduce(callback, initialValue)</span>
-      <span class="section-sub">returns single value</span>
-    </div>
-    <div class="section-body">
-      <div class="code-block">arr.<span class="code-fn">reduce</span>((<span class="code-num">acc</span>, <span class="code-num">cur</span>) => acc + cur, <span class="code-num">0</span>)
-<span class="code-comment">// acc  → accumulator (carries result across iterations)
-// cur  → current element in the loop
-// 0    → initial value of acc
-// just a loop with memory — returns one final value</span></div>
+  <script>
+    // Nav
+    function show(id) {
+      document.querySelectorAll('.section-page').forEach(p => p.classList.remove('active'));
+      document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+      document.getElementById(id).classList.add('active');
+      event.target.classList.add('active');
+    }
 
-      <div class="param-row">
-        <span class="param-label">arr =</span>
-        <input type="text" id="reduce-arr" value="2, 1, 5, 1, 3, 2">
-      </div>
-      <div class="param-row">
-        <span class="param-label">operation =</span>
-        <select id="reduce-op">
-          <option value="sum">acc + cur  (sum)</option>
-          <option value="product">acc * cur  (product)</option>
-          <option value="max">Math.max(acc, cur)</option>
-          <option value="min">Math.min(acc, cur)</option>
-        </select>
-        <button onclick="runReduce()">Run</button>
-      </div>
+    function parseArr(id) {
+      return (document.getElementById(id).value || '').split(',').map(s => s.trim()).map(s => isNaN(s) ? s : Number(s)).filter(s => s !== '');
+    }
+    function parseJSON(id) {
+      try { return JSON.parse(document.getElementById(id).value); } catch (e) { return null; }
+    }
+    function setResult(id, val, type = '') {
+      const el = document.getElementById(id);
+      el.className = 'result-box' + (type ? ' ' + type : '');
+      el.textContent = typeof val === 'string' ? val : JSON.stringify(val, null, 2);
+    }
+    function renderCells(id, arr, hiFn, rmFn) {
+      document.getElementById(id).innerHTML = arr.map((v, i) => {
+        const hi = hiFn ? hiFn(v, i) : false;
+        const rm = rmFn ? rmFn(v, i) : false;
+        return `<div class="acell ${hi ? 'hi' : rm ? 'rm' : ''}""><span class="idx">${i}</span>${v}</div>`;
+      }).join('');
+    }
 
-      <div class="steps-box">
-        <div class="steps-header">
-          <span>step</span><span>acc</span><span>cur</span><span>new acc</span>
-        </div>
-        <div id="reduce-steps"></div>
-      </div>
+    // MAP
+    function runMap() {
+      const arr = parseArr('map-arr').map(Number).filter(n => !isNaN(n));
+      const op = document.getElementById('map-op').value;
+      let result, label;
+      if (op === 'x*2') { result = arr.map(x => x * 2); label = 'x * 2'; }
+      if (op === 'x**2') { result = arr.map(x => x ** 2); label = 'x ** 2'; }
+      if (op === 'x+10') { result = arr.map(x => x + 10); label = 'x + 10'; }
+      if (op === 'str') { result = arr.map(x => String(x)); label = 'String(x)'; }
+      if (op === 'obj') { result = arr.map(x => ({ val: x })); label = '{val:x}'; }
+      renderCells('map-cells', arr);
+      setResult('map-result', `input:  [${arr}]\nop:     ${label}\noutput: ${JSON.stringify(result)}`);
+    }
 
-      <div class="result-row">
-        <div class="result-card">
-          <div class="result-label">Code used</div>
-          <div id="reduce-code" style="font-family:var(--mono);font-size:13px;color:var(--muted);margin-top:4px;"></div>
-        </div>
-        <div class="result-card">
-          <div class="result-label">Final result</div>
-          <div class="result-val" id="reduce-result"></div>
-        </div>
-      </div>
+    // FILTER
+    function runFilter() {
+      const arr = parseArr('filter-arr').map(Number).filter(n => !isNaN(n));
+      const op = document.getElementById('filter-op').value;
+      let fn, label;
+      if (op === 'even') { fn = x => x % 2 === 0; label = 'x%2===0'; }
+      if (op === 'odd') { fn = x => x % 2 !== 0; label = 'x%2!==0'; }
+      if (op === 'gt3') { fn = x => x > 3; label = 'x>3'; }
+      if (op === 'lt5') { fn = x => x < 5; label = 'x<5'; }
+      if (op === 'pos') { fn = x => x > 0; label = 'x>0'; }
+      const result = arr.filter(fn);
+      renderCells('filter-cells', arr, (v) => fn(v), null);
+      setResult('filter-result', `input:   [${arr}]\ncondition: ${label}\nkept:    [${result}]\nremoved: [${arr.filter(x => !fn(x))}]`);
+    }
 
-      <div class="patterns">
-        <div class="patterns-label">// common patterns</div>
-        <div class="code-block">arr.<span class="code-fn">reduce</span>((<span class="code-num">a</span>,<span class="code-num">b</span>) => a + b, <span class="code-num">0</span>)              <span class="code-comment">→ sum</span>
-arr.<span class="code-fn">reduce</span>((<span class="code-num">a</span>,<span class="code-num">b</span>) => a * b, <span class="code-num">1</span>)              <span class="code-comment">→ product</span>
-arr.<span class="code-fn">reduce</span>((<span class="code-num">a</span>,<span class="code-num">b</span>) => Math.<span class="code-fn">max</span>(a,b), -Infinity)  <span class="code-comment">→ max</span>
-arr.<span class="code-fn">reduce</span>((<span class="code-num">acc</span>,<span class="code-num">x</span>) => acc + x, <span class="code-num">0</span>)           <span class="code-comment">→ same as sum()</span></div>
-      </div>
-    </div>
-  </div>
+    // FOREACH
+    function runForEach() {
+      const arr = parseArr('foreach-arr');
+      let out = [];
+      arr.forEach((item, i) => out.push(`index ${i} → ${item}`));
+      setResult('foreach-result', out.join('\n') + '\n\nreturn value: undefined', 'info');
+    }
 
-  <!-- COMBO -->
-  <div class="section">
-    <div class="section-header">
-      <span class="badge badge-green">Combined</span>
-      <span class="section-title">slice + reduce together</span>
-      <span class="section-sub">sliding window trick</span>
-    </div>
-    <div class="section-body">
-      <div class="code-block"><span class="code-kw">const</span> arr = [<span class="code-num">2</span>,<span class="code-num">1</span>,<span class="code-num">5</span>,<span class="code-num">1</span>,<span class="code-num">3</span>,<span class="code-num">2</span>]
-<span class="code-kw">const</span> k = <span class="code-num">3</span>
+    // FIND
+    function runFind() {
+      const arr = parseArr('find-arr').map(Number).filter(n => !isNaN(n));
+      const op = document.getElementById('find-op').value;
+      let fn;
+      if (op === 'gt3') fn = x => x > 3;
+      if (op === 'even') fn = x => x % 2 === 0;
+      if (op === 'gt8') fn = x => x > 8;
+      if (op === 'lt0') fn = x => x < 0;
+      const found = arr.find(fn);
+      const idx = arr.findIndex(fn);
+      renderCells('find-cells', arr, (_, i) => i === idx);
+      setResult('find-result', `find()      → ${found !== undefined ? found : 'undefined'}\nfindIndex() → ${idx}`);
+    }
 
-<span class="code-kw">const</span> windowSum = arr
-  .<span class="code-fn">slice</span>(<span class="code-num">0</span>, k)              <span class="code-comment">// → [2, 1, 5]</span>
-  .<span class="code-fn">reduce</span>((<span class="code-num">a</span>,<span class="code-num">b</span>) => a + b, <span class="code-num">0</span>) <span class="code-comment">// → 8</span></div>
+    // INCLUDES
+    function runIncludes() {
+      const arr = parseArr('includes-arr');
+      const val = Number(document.getElementById('includes-val').value);
+      setResult('includes-result',
+        `includes(${val})    → ${arr.includes(val)}\nindexOf(${val})     → ${arr.indexOf(val)}\nlastIndexOf(${val}) → ${arr.lastIndexOf(val)}`);
+    }
 
-      <div class="param-row">
-        <span class="param-label">k =</span>
-        <input type="number" id="combo-k" value="3" min="1" max="10">
-        <button onclick="runCombo()">Run</button>
-      </div>
+    // SOME / EVERY
+    function runSomeEvery() {
+      const arr = parseArr('someevery-arr').map(Number).filter(n => !isNaN(n));
+      const op = document.getElementById('someevery-op').value;
+      let fn, label;
+      if (op === 'even') { fn = x => x % 2 === 0; label = 'x%2===0'; }
+      if (op === 'gt0') { fn = x => x > 0; label = 'x>0'; }
+      if (op === 'gt5') { fn = x => x > 5; label = 'x>5'; }
+      if (op === 'lt10') { fn = x => x < 10; label = 'x<10'; }
+      setResult('someevery-result',
+        `arr:   [${arr}]\ntest:  ${label}\n\nsome()  → ${arr.some(fn)}  (at least one passes)\nevery() → ${arr.every(fn)}  (all pass)`);
+    }
 
-      <div class="combo-result" id="combo-result"></div>
-    </div>
-  </div>
+    // MUTATE
+    let mutArr = [1, 2, 3, 4, 5];
+    function resetMut() {
+      mutArr = parseArr('mut-arr').map(Number).filter(n => !isNaN(n));
+      renderCells('mut-cells', mutArr);
+      setResult('mut-result', `current: [${mutArr}]`);
+    }
+    function runMut(op) {
+      if (!mutArr.length) mutArr = parseArr('mut-arr').map(Number).filter(n => !isNaN(n));
+      const val = Number(document.getElementById('mut-val').value);
+      let removed, len;
+      if (op === 'push') { len = mutArr.push(val); setResult('mut-result', `push(${val}) → added to end\nnew length: ${len}\narr: [${mutArr}]`); }
+      if (op === 'pop') { removed = mutArr.pop(); setResult('mut-result', `pop() → removed: ${removed}\narr: [${mutArr}]`); }
+      if (op === 'unshift') { len = mutArr.unshift(val); setResult('mut-result', `unshift(${val}) → added to start\nnew length: ${len}\narr: [${mutArr}]`); }
+      if (op === 'shift') { removed = mutArr.shift(); setResult('mut-result', `shift() → removed: ${removed}\narr: [${mutArr}]`); }
+      renderCells('mut-cells', mutArr);
+    }
+    window.addEventListener('load', () => { renderCells('mut-cells', mutArr); setResult('mut-result', `current: [${mutArr}]`); });
 
-</div>
+    // CONCAT / JOIN
+    function runConcat() {
+      const a = parseArr('concat-a');
+      const b = parseArr('concat-b');
+      const sep = document.getElementById('join-sep').value;
+      const merged = a.concat(b);
+      setResult('concat-result',
+        `concat:\n[${a}].concat([${b}])\n→ [${merged}]\n\njoin('${sep}'):\n→ "${merged.join(sep)}"`);
+    }
 
-<script>
-  function parseArr(id) {
-    return (document.getElementById(id).value || '')
-      .split(',')
-      .map(s => Number(s.trim()))
-      .filter(s => !isNaN(s));
-  }
+    // REDUCE
+    function runReduce() {
+      const arr = parseArr('reduce-arr').map(Number).filter(n => !isNaN(n));
+      const op = document.getElementById('reduce-op').value;
+      let fn, init, codeStr;
+      if (op === 'sum') { fn = (a, b) => a + b; init = 0; codeStr = 'reduce((acc,cur)=>acc+cur, 0)'; }
+      if (op === 'product') { fn = (a, b) => a * b; init = 1; codeStr = 'reduce((acc,cur)=>acc*cur, 1)'; }
+      if (op === 'max') { fn = (a, b) => Math.max(a, b); init = -Infinity; codeStr = 'reduce((acc,cur)=>Math.max(acc,cur), -Infinity)'; }
+      if (op === 'min') { fn = (a, b) => Math.min(a, b); init = Infinity; codeStr = 'reduce((acc,cur)=>Math.min(acc,cur), Infinity)'; }
+      if (op === 'count') { fn = (a) => a + 1; init = 0; codeStr = 'reduce((acc)=>acc+1, 0)'; }
+      let acc = init;
+      let html = '';
+      arr.forEach((cur, i) => {
+        const nw = fn(acc, cur);
+        const fmt = v => v === -Infinity ? '-Inf' : v === Infinity ? '+Inf' : v;
+        html += `<div class="step-r" style="display:grid;grid-template-columns:50px 90px 70px 1fr;gap:8px"><span>${i + 1}</span><span class="sa">${fmt(acc)}</span><span class="sc">${cur}</span><span class="sa">${fmt(nw)}</span></div>`;
+        acc = nw;
+      });
+      document.getElementById('reduce-steps').innerHTML =
+        `<div class="step-head" style="display:grid;grid-template-columns:50px 90px 70px 1fr;gap:8px"><span>step</span><span>acc</span><span>cur</span><span>new acc</span></div>${html}`;
+      const fin = acc === -Infinity ? '-Infinity' : acc === Infinity ? 'Infinity' : acc;
+      setResult('reduce-result', `${codeStr}\n\nresult → ${fin}`);
+    }
 
-  function runSlice() {
-    const arr = parseArr('slice-arr');
-    const start = parseInt(document.getElementById('slice-start').value) || 0;
-    const endRaw = document.getElementById('slice-end').value;
-    const end = endRaw === '' ? undefined : parseInt(endRaw);
-    const result = end === undefined ? arr.slice(start) : arr.slice(start, end);
+    // REDUCE → OBJ
+    function runReduceObj() {
+      const arr = parseArr('reduce-obj-arr');
+      const counts = arr.reduce((acc, cur) => { acc[cur] = (acc[cur] || 0) + 1; return acc; }, {});
+      setResult('reduce-obj-result', `arr: [${arr}]\n\ncounts:\n${JSON.stringify(counts, null, 2)}`);
+    }
 
-    document.getElementById('slice-orig').textContent = '[' + arr.join(', ') + ']';
+    // SLICE
+    function runSlice() {
+      const arr = parseArr('slice-arr');
+      const start = parseInt(document.getElementById('slice-start').value) || 0;
+      const endRaw = document.getElementById('slice-end').value;
+      const end = endRaw === '' ? undefined : parseInt(endRaw);
+      const result = end === undefined ? arr.slice(start) : arr.slice(start, end);
+      renderCells('slice-cells', arr, (_, i) => end === undefined ? i >= start : (i >= start && i < end));
+      setResult('slice-result', `original: [${arr}]\nslice(${start}${end !== undefined ? ', ' + end : ''}) → [${result}]`);
+    }
 
-    const cells = document.getElementById('slice-cells');
-    cells.innerHTML = arr.map((v, i) => {
-      const inSlice = end === undefined ? i >= start : (i >= start && i < end);
-      const cls = inSlice ? 'highlight' : '';
-      return `<div class="arr-cell ${cls}"><span class="idx">${i}</span>${v}</div>`;
-    }).join('');
+    // SPLICE
+    function runSplice() {
+      const arr = parseArr('splice-arr').map(Number).filter(n => !isNaN(n));
+      const start = parseInt(document.getElementById('splice-start').value) || 0;
+      const del = parseInt(document.getElementById('splice-del').value) || 0;
+      const ins = parseArr('splice-ins').map(Number).filter(n => !isNaN(n));
+      const copy = [...arr];
+      const removed = copy.splice(start, del, ...ins);
+      setResult('splice-result', `original:  [${arr}]\nsplice(${start}, ${del}${ins.length ? ', ' + ins : ''})\nremoved:   [${removed}]\nresult:    [${copy}]`);
+    }
 
-    document.getElementById('slice-result').textContent = '[' + result.join(', ') + ']';
-  }
+    // SORT
+    function runSort() {
+      const arr = parseArr('sort-arr').map(Number).filter(n => !isNaN(n));
+      const op = document.getElementById('sort-op').value;
+      const copy = [...arr];
+      if (op === 'asc') copy.sort((a, b) => a - b);
+      if (op === 'desc') copy.sort((a, b) => b - a);
+      if (op === 'lexi') copy.sort();
+      renderCells('sort-cells', copy);
+      setResult('sort-result', `original: [${arr}]\nsorted:   [${copy}]`);
+    }
 
-  function runReduce() {
-    const arr = parseArr('reduce-arr');
-    const op = document.getElementById('reduce-op').value;
-    let fn, init, codeStr;
+    // REVERSE
+    function runReverse() {
+      const arr = parseArr('rev-arr');
+      const copy = [...arr].reverse();
+      renderCells('rev-cells', copy);
+      setResult('rev-result', `original: [${arr}]\nreversed: [${copy}]`);
+    }
 
-    if (op === 'sum')     { fn = (a,b) => a+b; init = 0; codeStr = 'arr.reduce((acc, cur) => acc + cur, 0)'; }
-    if (op === 'product') { fn = (a,b) => a*b; init = 1; codeStr = 'arr.reduce((acc, cur) => acc * cur, 1)'; }
-    if (op === 'max')     { fn = (a,b) => Math.max(a,b); init = -Infinity; codeStr = 'arr.reduce((acc, cur) => Math.max(acc, cur), -Infinity)'; }
-    if (op === 'min')     { fn = (a,b) => Math.min(a,b); init = Infinity;  codeStr = 'arr.reduce((acc, cur) => Math.min(acc, cur), Infinity)'; }
+    // FLAT
+    function runFlat() {
+      try {
+        const raw = '[' + document.getElementById('flat-arr').value + ']';
+        const arr = JSON.parse(raw);
+        const depth = parseInt(document.getElementById('flat-depth').value) || 1;
+        setResult('flat-result', `input:  ${JSON.stringify(arr)}\nflat(${depth}): ${JSON.stringify(arr.flat(depth))}`);
+      } catch (e) { setResult('flat-result', 'parse error — check JSON format', 'warn'); }
+    }
+    function runFlatMap() {
+      try {
+        const raw = '[' + document.getElementById('flat-arr').value + ']';
+        const arr = JSON.parse(raw).flat(Infinity).map(Number).filter(n => !isNaN(n));
+        setResult('flat-result', `input:  [${arr}]\nflatMap(x=>[x,x*2]): [${arr.flatMap(x => [x, x * 2])}]`);
+      } catch (e) { setResult('flat-result', 'parse error', 'warn'); }
+    }
 
-    document.getElementById('reduce-code').textContent = codeStr;
+    // ARRAY FROM
+    function runFrom() {
+      const input = document.getElementById('from-input').value;
+      const op = document.getElementById('from-op').value;
+      if (op === 'str') {
+        setResult('from-result', `Array.from('${input}')\n→ ${JSON.stringify(Array.from(input))}`);
+      } else if (op === 'len') {
+        const n = parseInt(input) || 5;
+        const res = Array.from({ length: n }, (_, i) => i);
+        setResult('from-result', `Array.from({length:${n}}, (_,i)=>i)\n→ [${res}]`);
+      } else {
+        const nums = input.split(',').map(s => Number(s.trim())).filter(n => !isNaN(n));
+        const deduped = Array.from(new Set(nums));
+        setResult('from-result', `input:  [${nums}]\nArray.from(new Set(arr))\n→ [${deduped}]  (duplicates removed)`);
+      }
+    }
 
-    let acc = init;
-    let html = '';
-    arr.forEach((cur, i) => {
-      const newAcc = fn(acc, cur);
-      const fmt = v => v === -Infinity ? '-Inf' : v === Infinity ? '+Inf' : v;
-      html += `<div class="step-row">
-        <span style="color:var(--muted)">${i + 1}</span>
-        <span class="step-acc">${fmt(acc)}</span>
-        <span class="step-cur">${cur}</span>
-        <span class="step-acc">${fmt(newAcc)}</span>
-      </div>`;
-      acc = newAcc;
-    });
-    document.getElementById('reduce-steps').innerHTML = html;
+    // OBJ KEYS
+    function runObjKeys() {
+      const obj = parseJSON('obj-input');
+      if (!obj) return setResult('obj-keys-result', 'invalid JSON', 'warn');
+      setResult('obj-keys-result',
+        `Object.keys():\n  ${JSON.stringify(Object.keys(obj))}\n\nObject.values():\n  ${JSON.stringify(Object.values(obj))}\n\nObject.entries():\n  ${JSON.stringify(Object.entries(obj))}\n\nObject.fromEntries(entries):\n  ${JSON.stringify(Object.fromEntries(Object.entries(obj)))}`);
+    }
 
-    const final = acc === -Infinity ? '-Infinity' : acc === Infinity ? 'Infinity' : acc;
-    document.getElementById('reduce-result').textContent = final;
-  }
+    // FROM ENTRIES
+    function runFromEntries() {
+      const obj = parseJSON('fromentries-input');
+      if (!obj) return setResult('fromentries-result', 'invalid JSON', 'warn');
+      const op = document.getElementById('fromentries-op').value;
+      let result;
+      if (op === 'double') result = Object.fromEntries(Object.entries(obj).map(([k, v]) => [k, v * 2]));
+      if (op === 'upper') result = Object.fromEntries(Object.entries(obj).map(([k, v]) => [k.toUpperCase(), v]));
+      if (op === 'str') result = Object.fromEntries(Object.entries(obj).map(([k, v]) => [k, String(v)]));
+      setResult('fromentries-result', `original:\n${JSON.stringify(obj, null, 2)}\n\ntransformed:\n${JSON.stringify(result, null, 2)}`);
+    }
 
-  function runCombo() {
-    const arr = [2,1,5,1,3,2];
-    const k = parseInt(document.getElementById('combo-k').value) || 3;
-    const sliced = arr.slice(0, k);
-    const result = sliced.reduce((a,b) => a+b, 0);
-    document.getElementById('combo-result').innerHTML =
-      `<span class="step">arr =</span> <span class="arr">[${arr.join(', ')}]</span>\n` +
-      `<span class="step">arr.slice(0, ${k}) →</span> <span class="arr">[${sliced.join(', ')}]</span>\n` +
-      `<span class="step">.reduce(sum) →</span> <span class="val">${result}</span>`;
-  }
+    // ASSIGN
+    function runAssign() {
+      const a = parseJSON('assign-a'), b = parseJSON('assign-b');
+      if (!a || !b) return setResult('assign-result', 'invalid JSON', 'warn');
+      const merged = Object.assign({}, a, b);
+      const spread = { ...a, ...b };
+      setResult('assign-result', `A: ${JSON.stringify(a)}\nB: ${JSON.stringify(b)}\n\nObject.assign({}, A, B):\n${JSON.stringify(merged, null, 2)}\n\n{ ...A, ...B }:\n${JSON.stringify(spread, null, 2)}`);
+    }
 
-  runSlice();
-  runReduce();
-  runCombo();
-</script>
+    // HAS OWN
+    function runHasOwn() {
+      const obj = parseJSON('hasown-obj');
+      const key = document.getElementById('hasown-key').value.trim();
+      if (!obj) return setResult('hasown-result', 'invalid JSON', 'warn');
+      setResult('hasown-result',
+        `obj: ${JSON.stringify(obj)}\nkey: '${key}'\n\nObject.hasOwn(obj, '${key}')  → ${Object.hasOwn(obj, key)}\n'${key}' in obj                → ${key in obj}`);
+    }
+
+    // FREEZE
+    function runFreeze(type) {
+      const obj = parseJSON('freeze-obj');
+      if (!obj) return setResult('freeze-result', 'invalid JSON', 'warn');
+      if (type === 'freeze') {
+        Object.freeze(obj);
+        obj.newProp = 'test'; obj.name = 'changed';
+        setResult('freeze-result',
+          `Object.freeze(obj)\n\nobj.name = 'changed'  → silently ignored\nobj.newProp = 'test'  → silently ignored\n\nisFrozen: ${Object.isFrozen(obj)}\nobj still: ${JSON.stringify(obj)}`);
+      } else {
+        Object.seal(obj);
+        obj.newProp = 'test';
+        const firstKey = Object.keys(obj)[0];
+        obj[firstKey] = 'CHANGED';
+        setResult('freeze-result',
+          `Object.seal(obj)\n\nobj.newProp = 'test'           → silently ignored (no new props)\nobj.${firstKey} = 'CHANGED'   → allowed! (can modify existing)\n\nisSealed: ${Object.isSealed(obj)}\nobj: ${JSON.stringify(obj)}`);
+      }
+    }
+
+    // DESTRUCT OBJ
+    function runDestruct() {
+      const obj = parseJSON('destruct-obj');
+      if (!obj) return setResult('destruct-result', 'invalid JSON', 'warn');
+      const keys = document.getElementById('destruct-keys').value.split(',').map(s => s.trim());
+      const extracted = {};
+      keys.forEach(k => { if (k in obj) extracted[k] = obj[k]; });
+      const restKeys = Object.keys(obj).filter(k => !keys.includes(k));
+      const rest = Object.fromEntries(restKeys.map(k => [k, obj[k]]));
+      setResult('destruct-result',
+        `const { ${keys.join(', ')} } = obj\n\nextracted:\n${JSON.stringify(extracted, null, 2)}\n\n...rest:\n${JSON.stringify(rest, null, 2)}`);
+    }
+
+    // DESTRUCT ARR
+    function runArrDestruct() {
+      const arr = parseArr('arr-destruct');
+      const [first, second, ...rest] = arr;
+      setResult('arr-destruct-result',
+        `arr = [${arr}]\n\nconst [first, second, ...rest] = arr\n  first  → ${first}\n  second → ${second}\n  rest   → [${rest}]\n\nconst [,,third] = arr  (skip first two)\n  third  → ${arr[2]}\n\nswap trick: [x, y] = [y, x]\n  before: x=${arr[0]}, y=${arr[1]}\n  after:  x=${arr[1]}, y=${arr[0]}`);
+    }
+
+    // STRINGS
+    function runStr() {
+      const s = document.getElementById('str-input').value;
+      const op = document.getElementById('str-op').value;
+      let result;
+      if (op === 'split-space') result = JSON.stringify(s.split(' '));
+      if (op === 'split-') result = JSON.stringify(s.split(''));
+      if (op === 'upper') result = s.toUpperCase();
+      if (op === 'lower') result = s.toLowerCase();
+      if (op === 'trim') result = `"  ${s}  ".trim() → "${s.trim()}"`;
+      if (op === 'reverse') result = s.split('').reverse().join('');
+      if (op === 'replace') result = s.replace(/ /g, '_');
+      setResult('str-result', typeof result === 'string' ? result : JSON.stringify(result));
+    }
+    function runStrSlice() {
+      const s = document.getElementById('strslice-input').value;
+      const st = parseInt(document.getElementById('strslice-s').value) || 0;
+      const en = parseInt(document.getElementById('strslice-e').value);
+      setResult('strslice-result', `'${s}'.slice(${st}, ${en})\n→ '${s.slice(st, en)}'`);
+    }
+    function runStrAt() {
+      const s = document.getElementById('strslice-input').value;
+      setResult('strslice-result', `'${s}'.at(-1) → '${s.at(-1)}'\n'${s}'.at(0)  → '${s.at(0)}'`);
+    }
+
+    // Init
+    runMap(); runFilter(); runFind(); runReduce();
+    setTimeout(() => { runSlice(); resetMut(); }, 100);
+  </script>
 </body>
+
 </html>
